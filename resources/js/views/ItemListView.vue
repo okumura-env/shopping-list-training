@@ -29,51 +29,57 @@ onMounted(loadItems)
 
 <template>
   <div class="space-y-6">
-    <section class="bg-white rounded-lg shadow p-4">
-      <h2 class="text-lg font-semibold mb-3">アイテムを追加</h2>
+    <section class="bg-white rounded-2xl shadow-sm border border-pink-100 p-5">
+      <h2 class="text-lg font-semibold mb-3 text-pink-700">
+        ✨ アイテムを追加
+      </h2>
       <form @submit.prevent="addItem" class="flex gap-2">
         <input
           v-model="newName"
           type="text"
           placeholder="商品名"
-          class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          class="flex-1 px-3 py-2 border border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 placeholder-pink-300"
         />
         <input
           v-model.number="newQuantity"
           type="number"
           min="1"
-          class="w-20 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          class="w-20 px-3 py-2 border border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300"
         />
         <button
           type="submit"
-          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          class="px-5 py-2 bg-rose-300 text-white font-semibold rounded-xl hover:bg-rose-400 transition-colors shadow-sm"
         >
           追加
         </button>
       </form>
     </section>
 
-    <section class="bg-white rounded-lg shadow">
-      <h2 class="text-lg font-semibold p-4 border-b">リスト</h2>
-      <ul v-if="items.length" class="divide-y">
+    <section class="bg-white rounded-2xl shadow-sm border border-pink-100">
+      <h2 class="text-lg font-semibold p-5 border-b border-pink-100 text-pink-700">
+        🌸 リスト
+      </h2>
+      <ul v-if="items.length" class="divide-y divide-pink-100">
         <li
           v-for="item in items"
           :key="item.id"
-          class="flex items-center justify-between px-4 py-3"
+          class="flex items-center justify-between px-5 py-3 hover:bg-pink-50 transition-colors"
         >
           <div>
-            <span class="font-medium">{{ item.name }}</span>
-            <span class="ml-2 text-sm text-gray-500">× {{ item.quantity }}</span>
+            <span class="font-medium text-gray-700">{{ item.name }}</span>
+            <span class="ml-2 text-sm text-pink-500">× {{ item.quantity }}</span>
           </div>
           <button
             @click="removeItem(item.id)"
-            class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded"
+            class="px-3 py-1 text-sm text-rose-400 hover:bg-rose-50 rounded-lg transition-colors"
           >
             削除
           </button>
         </li>
       </ul>
-      <p v-else class="p-4 text-gray-500">アイテムがありません</p>
+      <p v-else class="p-5 text-pink-300 text-center">
+        アイテムがありません 🍒
+      </p>
     </section>
   </div>
 </template>
