@@ -109,6 +109,11 @@ input: ['resources/css/app.css', 'resources/js/app.ts'],
 
 ### Step 3: `.vue` ファイルに `lang="ts"` を追加
 
+以下の2ファイルの `<script setup>` を `<script setup lang="ts">` に変更します。
+
+- `resources/js/App.vue`
+- `resources/js/views/ItemListView.vue`
+
 ```vue
 <script setup lang="ts">
 // ... 既存のコード
