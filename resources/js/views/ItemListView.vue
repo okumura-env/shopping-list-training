@@ -31,7 +31,7 @@ onMounted(loadItems)
   <div class="space-y-6">
     <section class="bg-white rounded-2xl shadow-sm border border-pink-100 p-5">
       <h2 class="text-lg font-semibold mb-3 text-pink-700">
-        ✨ アイテムを追加
+        アイテムを追加
       </h2>
       <form @submit.prevent="addItem" class="flex gap-2">
         <input
@@ -57,7 +57,7 @@ onMounted(loadItems)
 
     <section class="bg-white rounded-2xl shadow-sm border border-pink-100">
       <h2 class="text-lg font-semibold p-5 border-b border-pink-100 text-pink-700">
-        🌸 リスト
+        🗒️ リスト
       </h2>
       <ul v-if="items.length" class="divide-y divide-pink-100">
         <li
@@ -78,7 +78,7 @@ onMounted(loadItems)
         </li>
       </ul>
       <p v-else class="p-5 text-pink-300 text-center">
-        アイテムがありません 🍒
+        アイテムがありません 🐒
       </p>
     </section>
   </div>
