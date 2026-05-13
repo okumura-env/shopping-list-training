@@ -145,16 +145,16 @@ git push origin okumura/task-1
 
 > 💡 なぜ `task-1` ブランチに直接コミットしないか:
 > - `task-1` はスタート地点のスナップショット。やり直したくなったら `git checkout task-1` で戻れるよう温存しておきます。
-> - PR が「`okumura/task-1` → `task-2`」となり、from/to が一目で区別できます。
+> - PR が「`okumura/task-1` → `task-1`」となり、自分が加えた変更だけが diff として見えるのでレビューしやすい。
 
 ### 4. PR を作成
 
-GitHub で **親リポジトリ（upstream）の次のタスクブランチに向けて** Pull Request を作成します。
+GitHub で **親リポジトリ（upstream）の自分が派生したタスクブランチ（`task-N`）に向けて** Pull Request を作成します。
 
-- **base リポジトリ / ブランチ**: `okumura-env/shopping-list-training` の `task-(N+1)`
+- **base リポジトリ / ブランチ**: `okumura-env/shopping-list-training` の `task-N`
 - **compare（head）リポジトリ / ブランチ**: `<あなたのGitHub>/shopping-list-training` の `<あなたの名前>/task-N`
 
-⚠️ **PR はマージしないでください**。`task-(N+1)` ブランチは次の受講生のスタート地点として綺麗に保つためです。
+⚠️ **PR はマージしないでください**。`task-N` ブランチは次の受講生のスタート地点として綺麗に保つためです。
 
 ### 5. 次のタスクへ
 

@@ -441,7 +441,7 @@ git push origin okumura/task-1   # ← 自分の作業ブランチ名
 
 GitHub で **親リポジトリ（upstream）の `task-1` に向けて** Pull Request を作成してください。
 
-- **base**: `okumura-env/shopping-list-training` の `task-2`
+- **base**: `okumura-env/shopping-list-training` の `task-1`
 - **compare（head）**: `<あなたのfork>/shopping-list-training` の `<名前>/task-1`
 
 ⚠️ **PR はマージしないでください**。`task-1` ブランチは次の受講生のスタート地点として綺麗に保つためです。

@@ -54,11 +54,11 @@ git commit -m "task-2: OpenAPI 型自動生成パイプラインを導入"
 git push origin okumura/task-2   # ← 自分の作業ブランチ名
 ```
 
-GitHub で **親リポジトリ（upstream）の `task-3` に向けて** Pull Request を作成してください。
+GitHub で **親リポジトリ（upstream）の `task-2` に向けて** Pull Request を作成してください。
 
-- **base**: `okumura-env/shopping-list-training` の `task-3`
+- **base**: `okumura-env/shopping-list-training` の `task-2`
 - **compare（head）**: `<あなたのfork>/shopping-list-training` の `okumura/task-2`
 
-⚠️ **PR はマージしないでください**。`task-3` ブランチは次の受講生のスタート地点として綺麗に保つためです。
+⚠️ **PR はマージしないでください**。`task-2` ブランチは次の受講生のスタート地点として綺麗に保つためです。
 
 次のタスクへ進むには `docs/task-3.md` を読んでください（冒頭にスタート手順があります）。
