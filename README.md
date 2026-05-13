@@ -41,7 +41,19 @@ git clone https://github.com/<あなたのGitHubユーザー名>/shopping-list-t
 cd shopping-list-training
 ```
 
-### 3. 環境変数ファイルの準備
+このとき `git remote -v` を打つと `origin`（= 自分のfork）しか登録されていません。次の手順で **親リポジトリを `upstream` として追加**します。
+
+### 3. 親リポジトリを `upstream` として登録
+
+```bash
+git remote add upstream https://github.com/okumura-env/shopping-list-training.git
+git remote -v   # origin と upstream の両方が表示されればOK
+```
+
+> 💡 `upstream` は単なる**remote名の慣習**で、Gitの予約語ではありません。`origin`（自分のfork）と区別するため「親」の意味で `upstream` と名付けるのが一般的です。
+> これで `git fetch upstream` や `git pull upstream task-2` が使えるようになります。
+
+### 4. 環境変数ファイルの準備
 
 ```bash
 cp .env.example .env
@@ -49,7 +61,7 @@ cp .env.example .env
 
 > ⚠️ ポートが他のプロジェクトと衝突する場合は `.env` の `APP_PORT` / `VITE_PORT` / `FORWARD_DB_PORT` を変更してください。
 
-### 4. Composer パッケージのインストール
+### 5. Composer パッケージのインストール
 
 ローカルに PHP 8.3 以上が入っていれば:
 
@@ -68,7 +80,7 @@ docker run --rm \
     composer install --ignore-platform-reqs
 ```
 
-### 5. Sail でコンテナ起動
+### 6. Sail でコンテナ起動
 
 ```bash
 ./vendor/bin/sail up -d
@@ -76,26 +88,26 @@ docker run --rm \
 
 > 💡 初回はイメージビルドで3〜5分かかります。
 
-### 6. アプリケーションキーの生成 & DB初期化
+### 7. アプリケーションキーの生成 & DB初期化
 
 ```bash
 ./vendor/bin/sail artisan key:generate
 ./vendor/bin/sail artisan migrate:fresh --seed
 ```
 
-### 7. npm パッケージのインストール
+### 8. npm パッケージのインストール
 
 ```bash
 ./vendor/bin/sail npm install
 ```
 
-### 8. Vite 開発サーバの起動（別ターミナル）
+### 9. Vite 開発サーバの起動（別ターミナル）
 
 ```bash
 ./vendor/bin/sail npm run dev
 ```
 
-### 9. ブラウザでアクセス
+### 10. ブラウザでアクセス
 
 `.env` の `APP_PORT` で指定したポートにアクセス（デフォルトは `http://localhost:8081`）。
 
@@ -105,11 +117,15 @@ docker run --rm \
 
 ## 🌿 課題の進め方
 
-### 1. task-1 ブランチをチェックアウト
+### 1. upstream から最新の task-1 を取得してチェックアウト
 
 ```bash
+git fetch upstream
 git checkout task-1
+git pull upstream task-1
 ```
+
+> 💡 各タスクの開始時に upstream から最新を取り込む癖をつけておくと、starter に修正が入っても安全に追随できます。
 
 ### 2. `docs/task-1.md` を読む
 
@@ -117,26 +133,32 @@ git checkout task-1
 
 ### 3. 実装する
 
-自分の作業ブランチを切って実装:
+自分の作業ブランチを切って実装します。ブランチ名は **`<あなたの名前>/task-N`** の形式にしてください（例: `okumura/task-1`）。誰の作業ブランチか PR レビュー時に一目でわかります。
 
 ```bash
-git checkout -b work/task-1
+git checkout -b okumura/task-1   # ← 自分の名前に置き換えてください
 # ... コードを編集 ...
 git add .
 git commit -m "task-1: TypeScript化"
-git push origin work/task-1
+git push origin okumura/task-1
 ```
+
+> 💡 なぜ `task-1` ブランチに直接コミットしないか:
+> - `task-1` はスタート地点のスナップショット。やり直したくなったら `git checkout task-1` で戻れるよう温存しておきます。
+> - PR が「`okumura/task-1` → `task-2`」となり、from/to が一目で区別できます。
 
 ### 4. PR を作成
 
-GitHub で Pull Request を作成 → レビューを受ける → マージ。
+GitHub で **親リポジトリ（upstream）の次のタスクブランチに向けて** Pull Request を作成します。
+
+- **base リポジトリ / ブランチ**: `okumura-env/shopping-list-training` の `task-(N+1)`
+- **compare（head）リポジトリ / ブランチ**: `<あなたのGitHub>/shopping-list-training` の `<あなたの名前>/task-N`
+
+⚠️ **PR はマージしないでください**。`task-(N+1)` ブランチは次の受講生のスタート地点として綺麗に保つためです。
 
 ### 5. 次のタスクへ
 
-```bash
-git checkout task-2
-# docs/task-2.md を読んで次へ
-```
+次の `docs/task-N+1.md` を読んでください。各タスクのドキュメント冒頭に**スタート手順（upstream から最新を取得 → 作業ブランチを切る）**が書かれています。
 
 詰まったら次の `task-N+1` ブランチに前タスクの完成形があるので、そこから続行できます。
 

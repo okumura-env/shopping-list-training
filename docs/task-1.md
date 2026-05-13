@@ -6,6 +6,29 @@ Vue 3 + JS で書かれた買い物リストアプリを **TypeScript化**しま
 
 ---
 
+## 🌿 まず作業ブランチを切る
+
+実装を始める前に、**upstream（親リポジトリ）から最新の `task-1` を取得**してから、自分の作業ブランチを切ります。ブランチ名は **`<あなたの名前>/task-1`** の形式にしてください（例: `okumura/task-1`）。
+
+```bash
+git fetch upstream
+git checkout task-1
+git pull upstream task-1           # 最新のスタート地点を取り込む
+git checkout -b okumura/task-1     # ← 自分の名前に置き換えてください
+```
+
+> 💡 各タスクの開始時に upstream から最新を取り込む癖をつけておくと、starter に修正が入っても安全に追随できます。
+
+### なぜ `task-1` で直接作業しないのか
+
+- `task-1` ブランチは **スタート地点** として残しておきます。やり直したくなったら `git checkout task-1` で戻れます。
+- PR を出すとき「`okumura/task-1` → `task-2`」と from/to が一目で区別できます。
+- `task-1`ブランチに更新があったときに`git pull upstream task-1` で更新を取り込めるよう、`task-1` は自分のコミットで汚さないようにする意図もあります。
+
+詳細は [README「課題の進め方」](../README.md#-課題の進め方) も参照してください。
+
+---
+
 ## 👀 まずは現状を確認
 
 ブラウザで `http://localhost:8081`（`.env`の`APP_PORT`に合わせて）を開いてください。買い物リストが表示されているはずです。
@@ -208,6 +231,34 @@ export function deleteItem(id: number) {
 ```
 * ここまで書いたら、API関数の引数の赤波線も解消されます。
 
+#### ⚠️ 代わりに ItemDetailView.vue で新しい赤波線が出るはず
+
+`getItem(id: number)` と型を付けた瞬間、**呼び出し側**で型エラーが出ます。
+
+> 💀 これも TypeScript が「型が合ってないよ」と教えてくれた例。JSの時は文字列の `"3"` をそのままURLに埋め込んでも動いていたのでバグに気づかなかったが、`getItem` の引数を `number` と宣言したことで、**呼び出し側の不整合まで芋づる式に見えるようになった**わけです。
+
+```resources/js/views/ItemDetailView.vue
+async function loadItem() {
+  const response = await getItem(route.params.id)  // ← ここに赤波線
+  item.value = response.data
+}
+```
+
+エラーの中身はこんな感じ:
+
+> Argument of type `'string | string[]'` is not assignable to parameter of type `'number'`.
+
+理由: `route.params.id` の型は **`string | string[]`** です。URL のパラメータは仕様上「常に文字列」なので、Vue Router はそう型付けしています(`/items/3` の `3` も TS から見れば文字列の `"3"`)。
+
+`Number()` で変換しましょう:
+
+```resources/js/views/ItemDetailView.vue
+async function loadItem() {
+  const response = await getItem(Number(route.params.id))   // ← Number() で囲む
+  item.value = response.data
+}
+```
+
 ### Step 7: 型チェックを通す
 
 ```bash
@@ -385,15 +436,16 @@ ItemDetailView.vue:XX:XX - error TS2339: Property 'name' does not exist on type 
 ```bash
 git add .
 git commit -m "task-1: Vue を TypeScript 化"
-git push origin work/task-1
+git push origin okumura/task-1   # ← 自分の作業ブランチ名
 ```
 
-GitHub で Pull Request を作成 → レビュー → マージ。
+GitHub で **親リポジトリ（upstream）の `task-1` に向けて** Pull Request を作成してください。
 
-次のタスクへ:
+- **base**: `okumura-env/shopping-list-training` の `task-2`
+- **compare（head）**: `<あなたのfork>/shopping-list-training` の `<名前>/task-1`
 
-```bash
-git checkout task-2
-```
+⚠️ **PR はマージしないでください**。`task-1` ブランチは次の受講生のスタート地点として綺麗に保つためです。
+
+次のタスクへ進むには `docs/task-2.md` を読んでください（冒頭にスタート手順があります）。
 
 タスク2では、この章で書いた手書きの `interface Item` を**捨てて**、Laravel の Resource から **自動生成された型**に置き換えます。書き直しに見えるかもしれませんが、それが「手書きを捨てる」ありがたみの体験です。
