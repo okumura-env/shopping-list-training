@@ -19,8 +19,9 @@ async function addItem() {
   await loadItems()
 }
 
-async function removeItem(id) {
-  await deleteItem(id)
+async function removeItem(item) {
+  if (!confirm(`「${item.name}」を削除しますか？`)) return
+  await deleteItem(item.id)
   await loadItems()
 }
 
@@ -66,11 +67,16 @@ onMounted(loadItems)
           class="flex items-center justify-between px-5 py-3 hover:bg-pink-50 transition-colors"
         >
           <div>
-            <span class="font-medium text-gray-700">{{ item.name }}</span>
+            <router-link
+              :to="`/items/${item.id}`"
+              class="font-medium text-gray-700 hover:text-pink-600 hover:underline"
+            >
+              {{ item.name }}
+            </router-link>
             <span class="ml-2 text-sm text-pink-500">× {{ item.quantity }}</span>
           </div>
           <button
-            @click="removeItem(item.id)"
+            @click="removeItem(item)"
             class="px-3 py-1 text-sm text-rose-400 hover:bg-rose-50 rounded-lg transition-colors"
           >
             削除

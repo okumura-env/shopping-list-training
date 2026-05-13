@@ -4,6 +4,10 @@ export function listItems() {
   return apiClient.get('/items');
 }
 
+export function getItem(id) {
+  return apiClient.get(`/items/${id}`);
+}
+
 export function createItem(data) {
   return apiClient.post('/items', data);
 }
