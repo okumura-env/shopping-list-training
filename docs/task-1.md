@@ -87,6 +87,7 @@ Vue 3 + JS で書かれた買い物リストアプリを **TypeScript化**しま
   "include": ["resources/js/**/*.ts", "resources/js/**/*.vue"]
 }
 ```
+* 赤波線が出る可能性があるがtsファイルがないから。Step2で解消
 
 ### Step 2: `.js` ファイルを `.ts` にリネーム
 
@@ -153,6 +154,8 @@ async function removeItem(item: Item) {
   // ...
 }
 ```
+*ここで `removeItem` 等の赤波線が解消されます。
+
 
 `resources/js/views/ItemDetailView.vue`:
 
@@ -162,7 +165,21 @@ import type { Item } from '../types/item'
 const item = ref<Item | null>(null)
 ```
 
-*ここで `removeItem` 等の赤波線が解消されます。
+> 💡 ここでは初期値が `null`（API 取得前は何もない）なので、型を `Item | null` にしています。
+> その結果、`item.value` の型は **`Item | null`** になるため、TypeScript は **`null` の可能性を考慮した書き方を要求**します。
+
+そのため `remove()` 関数で `item.value.name` のように直接アクセスすると「`item.value` が `null` の可能性があるよ」というエラー（赤波線）が出ます。先頭で **null チェック** を入れて早期 return しましょう:
+
+```ts
+async function remove() {
+  if (!item.value) return                                          // ← この行を追加
+  if (!confirm(`「${item.value.name}」を削除しますか？`)) return
+  await deleteItem(item.value.id)
+  router.push('/')
+}
+```
+
+> 💀 これは TypeScript の **strict null checks** が効いている状態。「null かも？」を見逃さないことで、たとえばロード前にボタンを連打したときの画面クラッシュみたいなバグを防いでくれます。
 
 ### Step 6: API関数にも型を付ける
 
