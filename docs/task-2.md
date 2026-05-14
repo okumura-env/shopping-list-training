@@ -51,9 +51,15 @@ Laravel のコードから OpenAPI 仕様（JSON）を自動生成してくれ�
 
 インストール後、`http://localhost:8081/docs/api.json` で OpenAPI 仕様の JSON が取得できるようになります。
 
-### Step 3: （注）routes/web.php は事前修正済み
+### Step 3: routes/web.php を修正
 
-`task-2` starter では `routes/web.php` の catch-all 正規表現を `^(?!api|docs).*$` に変えてあります。これは Scramble が出す `/docs/api.json` を openapi-typescript が読みに行けるようにするための設定で、**受講生が直す必要はありません**（catch-all のままだと `/docs/api.json` も SPA の HTML が返って型生成できないため）。
+Scramble が出す `/docs/api.json` を openapi-typescript が読みに行けるようにするため、`routes/web.php` の catch-all 正規表現を `^(?!api).*$` → `^(?!api|docs).*$` に変更する。
+
+```php
+Route::get('/{any?}', function () {
+    return view('app');
+})->where('any', '^(?!api|docs).*$');
+```
 
 ### Step 4: OpenAPI 仕様の中身を見る
 
