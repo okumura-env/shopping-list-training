@@ -1,26 +1,28 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { listItems, createItem, deleteItem } from '../api/items'
+import { handleError } from '../utils/handleError'
 import type { Item } from '../types/item'
 
 const items = ref<Item[]>([])
 const newName = ref<string>('')
 const newQuantity = ref<number>(1)
 const newPriority = ref<number>(3)
-const addError = ref<string | null>(null)
+const error = ref<string | null>(null)
 
 async function loadItems() {
+  error.value = null
   try {
     const response = await listItems()
     items.value = response.data
   } catch (e) {
-    alert('読み込みに失敗しました')
+    error.value = handleError(e, 'アイテムの読み込み')
   }
 }
 
 async function addItem() {
   if (!newName.value) return
-  addError.value = null
+  error.value = null
   try {
     await createItem({ name: newName.value, quantity: newQuantity.value, priority: newPriority.value })
     newName.value = ''
@@ -28,17 +30,18 @@ async function addItem() {
     newPriority.value = 3
     await loadItems()
   } catch (e) {
-    addError.value = 'アイテムの追加に失敗しました'
+    error.value = handleError(e, 'アイテムの追加')
   }
 }
 
 async function removeItem(item: Item) {
   if (!confirm(`「${item.name}」を削除しますか？`)) return
+  error.value = null
   try {
     await deleteItem(item.id)
     await loadItems()
   } catch (e) {
-    console.log('削除失敗', e)
+    error.value = handleError(e, 'アイテムの削除')
   }
 }
 
@@ -47,16 +50,17 @@ onMounted(loadItems)
 
 <template>
   <div class="space-y-6">
+    <div
+      v-if="error"
+      class="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-xl"
+    >
+      ⚠️ {{ error }}
+    </div>
+
     <section class="bg-white rounded-2xl shadow-sm border border-pink-100 p-5">
       <h2 class="text-lg font-semibold mb-3 text-pink-700">
         アイテムを追加
       </h2>
-      <div
-        v-if="addError"
-        class="mb-3 bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-xl"
-      >
-        ⚠️ {{ addError }}
-      </div>
       <form @submit.prevent="addItem" class="flex gap-2">
         <input
           v-model="newName"
@@ -73,7 +77,7 @@ onMounted(loadItems)
         <select
         v-model.number="newPriority"
         class="px-3 py-2 border border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300"
-        > 
+        >
             <option :value="1">1（最優先）</option>
             <option :value="2">2</option>
             <option :value="3">3</option>
