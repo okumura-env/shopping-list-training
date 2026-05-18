@@ -7,25 +7,39 @@ const items = ref<Item[]>([])
 const newName = ref<string>('')
 const newQuantity = ref<number>(1)
 const newPriority = ref<number>(3)
+const addError = ref<string | null>(null)
 
 async function loadItems() {
-  const response = await listItems()
-  items.value = response.data
+  try {
+    const response = await listItems()
+    items.value = response.data
+  } catch (e) {
+    alert('読み込みに失敗しました')
+  }
 }
 
 async function addItem() {
   if (!newName.value) return
-  await createItem({ name: newName.value, quantity: newQuantity.value, priority: newPriority.value })
-  newName.value = ''
-  newQuantity.value = 1
-  newPriority.value = 3 
-  await loadItems()
+  addError.value = null
+  try {
+    await createItem({ name: newName.value, quantity: newQuantity.value, priority: newPriority.value })
+    newName.value = ''
+    newQuantity.value = 1
+    newPriority.value = 3
+    await loadItems()
+  } catch (e) {
+    addError.value = 'アイテムの追加に失敗しました'
+  }
 }
 
 async function removeItem(item: Item) {
   if (!confirm(`「${item.name}」を削除しますか？`)) return
-  await deleteItem(item.id)
-  await loadItems()
+  try {
+    await deleteItem(item.id)
+    await loadItems()
+  } catch (e) {
+    console.log('削除失敗', e)
+  }
 }
 
 onMounted(loadItems)
@@ -37,6 +51,12 @@ onMounted(loadItems)
       <h2 class="text-lg font-semibold mb-3 text-pink-700">
         アイテムを追加
       </h2>
+      <div
+        v-if="addError"
+        class="mb-3 bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-xl"
+      >
+        ⚠️ {{ addError }}
+      </div>
       <form @submit.prevent="addItem" class="flex gap-2">
         <input
           v-model="newName"
