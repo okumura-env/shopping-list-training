@@ -1,6 +1,8 @@
 # 🛒 買い物リスト 研修課題
 
-Vue 3 × Laravel を使った、**TypeScript導入・OpenAPI型自動生成・エラーハンドリング**のハンズオン課題です。
+おはようさん、ワシや、ガネーシャや🐘。🎵ガネ・ガネ・ガネーシャモーニング🎵を歌いながら出てきたで。
+
+これはな、Vue 3 × Laravel を使った **TypeScript導入・OpenAPI型自動生成・エラーハンドリング** のハンズオン課題や。お前にはこの「買い物リストアプリ」を、タスクを1つずつクリアしながら鍛え上げていってもらう。スーパーマリオで言うところのワールド1-1からスタートや。
 
 ## 🎯 この課題で身につくこと
 
@@ -8,11 +10,13 @@ Vue 3 × Laravel を使った、**TypeScript導入・OpenAPI型自動生成・�
 2. **OpenAPI による型の自動生成** — バックエンドと型を常に一致させる仕組み
 3. **エラーハンドリングの責務分離** — axios interceptor / composable / UIコンポーネント
 
+> 💡 ワシの教え子のアインシュタインくんも「想像力は知識より大事」言うてたけど、結局のとこ手を動かしてみんと身につかへんからな。読むだけやのうて、実際にコード書いて体験してこそや。
+
 ---
 
 ## 📚 課題の構成
 
-各タスクは**ブランチ**として用意されています。前のタスクの完成形が次のタスクのスタート地点になっています。
+各タスクは **ブランチ** として用意されてるで。前のタスクの完成形が次のタスクのスタート地点になってる、っちゅう仕掛けや。
 
 | ブランチ | 内容 |
 |---|---|
@@ -23,15 +27,21 @@ Vue 3 × Laravel を使った、**TypeScript導入・OpenAPI型自動生成・�
 | `task-5` | バリデーション + 422表示 |
 | `complete` | 全部完成形 |
 
-各タスクの詳細は `docs/task-N.md` を参照してください。
+各タスクの詳細は `docs/task-N.md` を見るんやで。
+
+> 💡 ステージごとにセーブポイントがある、ファミコンのゲームみたいなもんや。途中で詰まったら次のブランチに「正解」があるから、そこから再開できるで。
 
 ---
 
 ## 🚀 セットアップ
 
+ここからが下ごしらえや。料理と一緒で、ここを丁寧にやらんと後で泣くからな。
+
 ### 1. リポジトリを Fork
 
-右上の「Fork」ボタンで自分のアカウントにコピーします。
+右上の「Fork」ボタンで自分のアカウントにコピーする。
+
+> 💡 Fork っちゅうのはな、「親のキッチン」を「自分のキッチン(GitHub)」に丸ごとコピーすることや。これでお前の家で好きなだけ料理（コード変更）できるようになる。
 
 ### 2. ローカルに clone
 
@@ -41,7 +51,7 @@ git clone https://github.com/<あなたのGitHubユーザー名>/shopping-list-t
 cd shopping-list-training
 ```
 
-このとき `git remote -v` を打つと `origin`（= 自分のfork）しか登録されていません。次の手順で **親リポジトリを `upstream` として追加**します。
+このとき `git remote -v` を打つと `origin`（= 自分の fork）しか登録されてへん。次の手順で **親リポジトリを `upstream` として追加** するで。
 
 ### 3. 親リポジトリを `upstream` として登録
 
@@ -50,8 +60,10 @@ git remote add upstream https://github.com/okumura-env/shopping-list-training.gi
 git remote -v   # origin と upstream の両方が表示されればOK
 ```
 
-> 💡 `upstream` は単なる**remote名の慣習**で、Gitの予約語ではありません。`origin`（自分のfork）と区別するため「親」の意味で `upstream` と名付けるのが一般的です。
-> これで `git fetch upstream` や `git pull upstream task-2` が使えるようになります。
+> 💡 `upstream` は単なる **remote 名の慣習** で、Git の予約語ではないんやで。`origin`（自分の fork）と区別するため「親」の意味で `upstream` と名付けるのが一般的や。
+> これで `git fetch upstream` や `git pull upstream task-2` が使えるようになる。
+
+> ⚠️ 初心者あるある：「えっ、`upstream` ってコマンドちゃうの？」って思う人おる。違うで、ただの「ニックネーム」や。`parent` でも `oya` でも動くんやけど、`upstream` がみんなの共通言語っちゅうこっちゃ。
 
 ### 4. 環境変数ファイルの準備
 
@@ -59,17 +71,17 @@ git remote -v   # origin と upstream の両方が表示されればOK
 cp .env.example .env
 ```
 
-> ⚠️ ポートが他のプロジェクトと衝突する場合は `.env` の `APP_PORT` / `VITE_PORT` / `FORWARD_DB_PORT` を変更してください。
+> ⚠️ ポートが他のプロジェクトと衝突する場合は `.env` の `APP_PORT` / `VITE_PORT` / `FORWARD_DB_PORT` を変更してや。
 
 ### 5. Composer パッケージのインストール
 
-ローカルに PHP 8.3 以上が入っていれば:
+ローカルに PHP 8.3 以上が入ってれば:
 
 ```bash
 composer install
 ```
 
-入っていない場合は Docker 経由:
+入ってない場合は Docker 経由でいくで:
 
 ```bash
 docker run --rm \
@@ -86,7 +98,7 @@ docker run --rm \
 ./vendor/bin/sail up -d
 ```
 
-> 💡 初回はイメージビルドで3〜5分かかります。
+> 💡 初回はイメージビルドで3〜5分かかるで。あんみつでも食って待っとき🍨。
 
 ### 7. アプリケーションキーの生成 & DB初期化
 
@@ -111,60 +123,18 @@ docker run --rm \
 
 `.env` の `APP_PORT` で指定したポートにアクセス（デフォルトは `http://localhost:8081`）。
 
-買い物リストの画面が表示されれば成功です 🎉
+買い物リストの画面が表示されたら成功や 🎉 さすガネーシャ…じゃなくて、さすが、お前や！
 
 ---
 
-## 🌿 課題の進め方
+ほな、さっそく `task-1`(docs/task-1.md参照) から始めるで。お前の成長、ワシ楽しみにしとるからな。
 
-### 1. upstream から最新の task-1 を取得してチェックアウト
+お供えのあんみつは随時受付中や🍨。困ったら持ってきや、優しく教えたるで。
+はい、Oh, My God!! ←親友の釈迦と決めポーズや。
 
-```bash
-git fetch upstream
-git checkout task-1
-git pull upstream task-1
-```
 
-> 💡 各タスクの開始時に upstream から最新を取り込む癖をつけておくと、starter に修正が入っても安全に追随できます。
-
-### 2. `docs/task-1.md` を読む
-
-タスクの目的・やること・完了基準が書かれています。
-
-### 3. 実装する
-
-自分の作業ブランチを切って実装します。ブランチ名は **`<あなたの名前>/task-N`** の形式にしてください（例: `okumura/task-1`）。誰の作業ブランチか PR レビュー時に一目でわかります。
-
-```bash
-git checkout -b okumura/task-1   # ← 自分の名前に置き換えてください
-# ... コードを編集 ...
-git add .
-git commit -m "task-1: TypeScript化"
-git push origin okumura/task-1
-```
-
-> 💡 なぜ `task-1` ブランチに直接コミットしないか:
-> - `task-1` はスタート地点のスナップショット。やり直したくなったら `git checkout task-1` で戻れるよう温存しておきます。
-> - PR が「`okumura/task-1` → `task-1`」となり、自分が加えた変更だけが diff として見えるのでレビューしやすい。
-
-### 4. PR を作成
-
-GitHub で **親リポジトリ（upstream）の自分が派生したタスクブランチ（`task-N`）に向けて** Pull Request を作成します。
-
-- **base リポジトリ / ブランチ**: `okumura-env/shopping-list-training` の `task-N`
-- **compare（head）リポジトリ / ブランチ**: `<あなたのGitHub>/shopping-list-training` の `<あなたの名前>/task-N`
-
-⚠️ **PR はマージしないでください**。`task-N` ブランチは次の受講生のスタート地点として綺麗に保つためです。
-
-### 5. 次のタスクへ
-
-次の `docs/task-N+1.md` を読んでください。各タスクのドキュメント冒頭に**スタート手順（upstream から最新を取得 → 作業ブランチを切る）**が書かれています。
-
-詰まったら次の `task-N+1` ブランチに前タスクの完成形があるので、そこから続行できます。
-
----
-
-## 🛠️ よく使うコマンド
+## 付録
+### 🛠️ よく使うコマンド
 
 | やりたいこと | コマンド |
 |---|---|
@@ -175,15 +145,18 @@ GitHub で **親リポジトリ（upstream）の自分が派生したタスク�
 | DBリセット&シード | `./vendor/bin/sail artisan migrate:fresh --seed` |
 | ログ確認 | `./vendor/bin/sail logs -f` |
 
-> 💡 `alias sail='./vendor/bin/sail'` を `.zshrc` に追加すると楽です。
+> 💡 `alias sail='./vendor/bin/sail'` を `.zshrc` に追加すると楽やで。
+> ワシの教え子の坂本龍馬くんも「世の中もっと便利にせなアカン」言うてたな。それと同じや。タイピングの手間を削るのは正義や。
 
 ---
 
-## ❓ トラブルシューティング
+### ❓ トラブルシューティング
+
+詰まったらここを見て。よくある罠を集めたで。
 
 ### ポートが既に使われている
 
-別のDockerプロジェクトが80/3306/5173を使っている場合、`.env` で以下を変更:
+別の Docker プロジェクトが 80 / 3306 / 5173 を使ってる場合、`.env` で以下を変更や:
 
 ```env
 APP_PORT=8081           # ホスト側のLaravelポート
@@ -191,26 +164,30 @@ VITE_PORT=5174          # ホスト側のViteポート
 FORWARD_DB_PORT=33306   # ホスト側のMySQLポート
 ```
 
-変更後は `./vendor/bin/sail down && ./vendor/bin/sail up -d` で再起動。
+変更後は `./vendor/bin/sail down && ./vendor/bin/sail up -d` で再起動してや。
 
-### `php artisan` がローカルで動かない
+> 💡 ポート衝突は「同じ道路を別の車が使ってる」状態や。別の道（ポート番号）に逃すだけ。慌てんでええで。
 
-このプロジェクトは PHP 8.3+ を要求します。ローカルのPHPが古い場合は **Sail経由**でartisanを実行してください:
+#### `php artisan` がローカルで動かない
+
+このプロジェクトは PHP 8.3+ を要求するんや。ローカルの PHP が古い場合は **Sail 経由** で artisan を実行してや:
 
 ```bash
 ./vendor/bin/sail artisan migrate    # ✅ コンテナ内のPHPで実行される
 php artisan migrate                   # ❌ ローカルPHPが古いとエラー
 ```
 
-### MySQL が立ち上がる前にマイグレーションを実行してエラー
+#### MySQL が立ち上がる前にマイグレーションを実行してエラー
 
 ```bash
 sleep 10 && ./vendor/bin/sail artisan migrate:fresh --seed
 ```
 
+> 💡 これな、MySQL の起動を待ってあげへんと「まだ寝てるのに叩き起こすな！」って怒られる状態や。`sleep 10` で 10 秒待ってから声かけるだけや。
+
 ---
 
-## 📦 技術スタック
+### 📦 技術スタック
 
 | 分類 | 技術 |
 |---|---|
@@ -223,9 +200,12 @@ sleep 10 && ./vendor/bin/sail artisan migrate:fresh --seed
 
 ---
 
-## 📖 関連教材
+### 📖 関連教材
 
 - `docs/task-1.md` 〜 `task-5.md` 各タスクのガイド
 - TypeScript入門ガイド for Vue 3ユーザー（社内資料）
 - フロントエンドエラーハンドリング完全攻略（社内資料）
 - OpenAPI で型を自動生成してフロントエンドで安全に使う方法（社内資料）
+
+---
+

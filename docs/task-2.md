@@ -2,58 +2,92 @@
 
 ## 🎯 このタスクのゴール
 
-タスク1で**手書きで書いた `interface Item`** を捨てて、Laravel の Resource から **OpenAPI 仕様を生成 → そこから TypeScript の型を自動生成** するパイプラインに置き換えます。
+おかえり、ワシや、ガネーシャや🐘。タスク1お疲れさん、よう頑張ったな。今日もあんみつ食いながら待っとったで🍨。
 
-> 💡 タスク1の最後で見た「手書きの型は嘘をつく」問題（interface が実際のレスポンスと食い違っても気づけない）を、**バックエンドを唯一の真実とする型の自動同期**で解決するのが狙いです。
+さてここからが本番や。タスク1で **手書きで書いた `interface Item`** を **捨てて**、Laravel の Resource から **OpenAPI 仕様を生成 → そこから TypeScript の型を自動生成** するパイプラインに置き換えていくで。
+
+「えー、せっかく書いたのに捨てんの！？」って思うやろ？それがな、ホンマの学びや。ワシの教え子のガリレオくんも「天動説、ワシ信じてたけど捨てるわ」言うて地動説に乗り換えたやろ？真実が見えたら古い仮説は潔く捨てる。それがプロや。
+
+> 💡 タスク1の最後で見た「手書きの型は嘘をつく」問題（interface が実際のレスポンスと食い違っても気づけへん）を、**バックエンドを唯一の真実とする型の自動同期** で解決するのが狙いや。
 
 ---
 
 ## 🌿 まず作業ブランチを切る
 
-実装を始める前に、**upstream（親リポジトリ）から最新の `task-2` を取得**してから、自分の作業ブランチを切ります。ブランチ名は **`<あなたの名前>/task-2`** の形式にしてください（例: `okumura/task-2`）。
+タスク1と同じリズムやで。実装を始める前に、**upstream（親リポジトリ）から最新の `task-2` を取得** してから、自分の作業ブランチを切るんや。ブランチ名は **`<お前の名前>/task-2`** の形式にしてや（例: `okumura/task-2`）。
 
 ```bash
 git fetch upstream
 git checkout task-2
 git pull upstream task-2           # 最新のスタート地点を取り込む
-git checkout -b okumura/task-2     # ← 自分の名前に置き換えてください
+git checkout -b okumura/task-2     # ← 自分の名前に置き換えるんやで
 ```
 
-> 💡 `task-2` ブランチは **タスク1を完了した状態（TypeScript化済み）** がスタート地点です。
+> 💡 `task-2` ブランチは **タスク1を完了した状態（TypeScript化済み）** がスタート地点や。お前が前回頑張った成果が、そのまま乗ってる状態から始められるで。
 
 ---
 
 ## ✏️ 本題: 型を自動生成する
 
-このタスクで使うライブラリ:
+このタスクで使うライブラリを先に紹介しとくで。
 
-- **`dedoc/scramble`**（バックエンド）— Laravel のコードから **OpenAPI 仕様（JSON）を自動生成**。PHP の型ヒントから推論するのでアノテーションを書く必要がない
-- **`openapi-typescript`**（フロントエンド）— OpenAPI 仕様 → TypeScript の型定義を生成
+- **`dedoc/scramble`**（バックエンド）— Laravel のコードから **OpenAPI 仕様（JSON）を自動生成**。PHP の型ヒントから推論するから、アノテーションを書く必要がないっちゅう優れもの。
+- **`openapi-typescript`**（フロントエンド）— OpenAPI 仕様 → TypeScript の型定義を生成。
+
+> 💡 「OpenAPI」っちゅうのはな、API の仕様書を **機械が読める形式で書く規格** や。これが共通言語になっとるから、バックエンドが出した OpenAPI をフロントエンドのツールが読んで型を作る、っちゅう連携ができるわけや。
+> ワシの教え子の始皇帝くんも「文字と度量衡は統一せなアカン」言うて中国を統一したやろ？OpenAPI も同じや。共通規格があるからこそ、ツール同士が会話できる。
 
 ### Step 1: TypeScript を 5.x に揃える（前提）
 
-`openapi-typescript` の v7 は **TypeScript 5.x が peer dependency** になっています。
-タスク1で何も指定せずに `npm install -D typescript` した場合、最新の TS 6 が入っているはずです。これを 5.x に揃えます。
+`openapi-typescript` の v7 は **TypeScript 5.x が peer dependency** になっとるんや。
+タスク1で何も指定せずに `npm install -D typescript` した場合、最新の TS 6 が入っとるはずや。これを 5.x に揃えるで。
 
 ```bash
 ./vendor/bin/sail npm install -D typescript@^5
 ```
 
-> 💡 ライブラリ同士のバージョン整合性は実務でしばしば出る課題です。「最新を入れたら依存先がついてこない」みたいなことが起きます。`peerDependencies` を読む習慣をつけましょう。
+> 💡 ライブラリ同士のバージョン整合性は実務でしょっちゅう出る課題や。「最新を入れたら依存先がついてこんかった」みたいなことが起きる。
+> ワシの教え子のニュートンくんも「全ては相互作用」言うてたな。npm のパッケージも一緒で、依存先と支え合っとるんや。`npm install` 時に "peer dependency" の警告が出たら無視せんと読む癖をつけや。
 
 ### Step 2: Scramble をインストール
 
-Laravel のコードから OpenAPI 仕様（JSON）を自動生成してくれるライブラリ。
+Laravel のコードから OpenAPI 仕様（JSON）を自動生成してくれる、めっちゃ優秀なやつや。
 
 ```bash
 ./vendor/bin/sail composer require dedoc/scramble
 ```
 
-インストール後、`http://localhost:8081/docs/api.json` で OpenAPI 仕様の JSON が取得できるようになります。
+インストール後、`http://localhost:8081/docs/api.json` で OpenAPI 仕様の JSON が取得できるようになるで。
+
+#### 💡 なんでインストールだけで動くんや？
+
+「えっ、コード何も書いてへんのに自動で生成されんの？魔法か？」って思うやろ？魔法やない、仕組みがあるんや。
+
+Scramble はインストールされた瞬間から **`routes/api.php` を自動でスキャン** しよる。そして、
+
+```
+routes/api.php
+└─ Route::apiResource('items', ItemController::class)   ← この1行が出発点
+       ↓
+   ItemController の index / show / store / update / destroy メソッドを発見
+       ↓
+   各メソッドが返す Item モデルを辿る
+       ↓
+   Item モデルの $casts と migration の column 定義から
+   id / name / quantity / memo / purchased / created_at / updated_at を推論
+       ↓
+   components.schemas.Item として OpenAPI に出力
+```
+
+っちゅう流れで JSON が組み立てられるんや。
+
+> ⚠️ ここポイントや：**「全てのモデル」が自動で出てくるわけやないで**。
+> あくまで **`routes/api.php` で API として公開されているルートに紐づくモデル** だけや。
+> 例えば仮に `UserNote` っちゅうモデルがあっても、`routes/api.php` でルートが切られてなければ OpenAPI には出てこん。**プライベートなモデルは公開されへん** っちゅうことや。安心やろ？
 
 ### Step 3: routes/web.php を修正
 
-Scramble が出す `/docs/api.json` を openapi-typescript が読みに行けるようにするため、`routes/web.php` の catch-all 正規表現を `^(?!api).*$` → `^(?!api|docs).*$` に変更する。
+Scramble が出す `/docs/api.json` を openapi-typescript が読みに行けるようにするため、`routes/web.php` の catch-all 正規表現を `^(?!api).*$` → `^(?!api|docs).*$` に変更してな。
 
 ```php
 Route::get('/{any?}', function () {
@@ -61,15 +95,18 @@ Route::get('/{any?}', function () {
 })->where('any', '^(?!api|docs).*$');
 ```
 
+> ⚠️ 初心者あるある：「Scramble インストールしたのに `/docs/api.json` で Vue の画面が出てくる…なんでや！？」ってなるパターンや。
+> これな、Laravel が SPA ルートに先取りされとるからや。`docs/*` も catch-all から除外せなアカンで。
+
 ### Step 4: OpenAPI 仕様の中身を見る
 
-Scramble が `/docs/api.json` に出す OpenAPI 3.1.0 形式の JSON を覗いてみましょう:
+Scramble が `/docs/api.json` に出してくれる OpenAPI 3.1.0 形式の JSON、ちょっと覗いてみよか:
 
 ```bash
 curl -s http://localhost:8081/docs/api.json | python3 -m json.tool | head -80
 ```
 
-出力されるトップレベルの構造はこんな感じ:
+出力されるトップレベルの構造はこんな感じや:
 
 | キー | 意味 |
 |---|---|
@@ -79,11 +116,14 @@ curl -s http://localhost:8081/docs/api.json | python3 -m json.tool | head -80
 | `paths` | **各 URL に対する操作**。例えば `/items` の `get`（一覧取得） `post`（作成）、`/items/{item}` の `get` `put` `delete` |
 | `components.schemas` | **共通の型定義**（`Item` などはここに置かれる） |
 
-例えば `paths./items` の `get` を見ると、`responses.200.content.application/json.schema` に `"$ref": "#/components/schemas/Item"` と書かれています。これは「**この API は `Item` 型を返す**」という意味で、Item の具体的なプロパティは `components.schemas.Item` の方に書かれている、という参照関係になっています。
+例えば `paths./items` の `get` を見ると、`responses.200.content.application/json.schema` に `"$ref": "#/components/schemas/Item"` と書いてあるはずや。
+これは「**この API は `Item` 型を返す**」っちゅう意味で、Item の具体的なプロパティは `components.schemas.Item` の方に書かれてる、という **参照関係** になっとる。
+
+> 💡 同じ型を何度も書かんで済むようにする仕組みやな。ワシの教え子のレオナルド・ダ・ヴィンチくんも「一度描いたデッサンを参考に何枚も絵を描く」言うてたけど、それと同じや。重複を避けて、参照で繋ぐ。
 
 #### Item スキーマの中身
 
-`components.schemas.Item` のところに Item の型情報があります:
+**先ほど `curl` で取得した OpenAPI JSON** の中を見ると、`components.schemas.Item` のところに Item の型情報があるで:
 
 ```json
 "Item": {
@@ -100,9 +140,10 @@ curl -s http://localhost:8081/docs/api.json | python3 -m json.tool | head -80
 }
 ```
 
-> 💡 タスク1で**手書き**した `interface Item` と比べてみてください。
-> - `created_at: string | null` ← Scramble は DB の nullable まで拾ってくれている（手書きでは `string` でズレていた）
-> - これが「**バックエンドの真実をそのまま伝える**」ということです。
+> 💡 タスク1で **手書き** した `interface Item`(resources/js/types/item.ts) と比べてみい。
+> - `created_at: string | null` ← Scramble は DB の nullable まで拾ってくれとる（手書きでは `string` でズレてたな）
+> - これが「**バックエンドの真実をそのまま伝える**」っちゅうことや。
+> - 名探偵コナンくんの「真実はいつも1つや」を思い出しや。バックエンドの実装こそが真実で、それを忠実に伝えるのが Scramble の仕事や。
 
 ### Step 5: openapi-typescript を導入
 
@@ -110,9 +151,11 @@ curl -s http://localhost:8081/docs/api.json | python3 -m json.tool | head -80
 ./vendor/bin/sail npm install -D openapi-typescript
 ```
 
+これがな、OpenAPI 仕様（JSON）を読んで TypeScript の型定義に変換してくれるツールや。
+
 ### Step 6: 型生成スクリプトを `package.json` に追加
 
-`scripts` セクションに `generate:types` コマンドを追加:
+`scripts` セクションに `generate:types` コマンドを追加するで:
 
 ```json
 "scripts": {
@@ -122,19 +165,65 @@ curl -s http://localhost:8081/docs/api.json | python3 -m json.tool | head -80
 }
 ```
 
-> 💡 ホスト名が `laravel.test` なのは、Sail コンテナ内から Laravel コンテナを参照するため。`localhost` はコンテナ内では「自分自身（npm が動いているコンテナ）」を指すので使えません。
-
 ### Step 7: 型を生成
 
 ```bash
 ./vendor/bin/sail npm run generate:types
 ```
 
-`resources/js/types/api.d.ts` が生成されます。これが OpenAPI から自動生成された **TypeScript の真実** です。中を覗いてみると、`components.schemas.Item` などの型が並んでいます。
+`resources/js/types/api.d.ts` が生成される。これが OpenAPI から自動生成された **TypeScript の真実** や。
+
+中を覗いてみい。1000行近くあるけどビビらんでええ。今お前が気にすべきは **`export interface components`** の中の **`schemas`** の中の **`Item`** や。ざっくりこんな構造になっとるはずやで:
+
+```ts
+// resources/js/types/api.d.ts （ものすごく抜粋）
+export interface components {
+  schemas: {
+    Item: {
+      id: number;
+      name: string;
+      quantity: number;
+      memo: string | null;
+      purchased: boolean;
+      created_at: string | null;   // ← Scramble は nullable まで正確に拾ってる
+      updated_at: string | null;
+    };
+    // ...他にも paths から拾ったスキーマが並ぶ
+  };
+  // responses, parameters, ... 他のセクションもあるけど今は無視でええ
+}
+```
+
+つまり **`components.schemas.Item` を辿れば、バックエンドの真実そのままの `Item` 型がいる** っちゅうことや。次の Step 8 でこれを使うで。
+
+> ⚠️ `api.d.ts` は **絶対に手で編集したらアカン** で。次に `npm run generate:types` した瞬間、上書きされて消えるからな。「自動生成ファイル」っちゅうのはそういうもんや。
 
 ### Step 8: 手書き interface Item を捨てる
 
-`resources/js/types/item.ts` を以下のように書き換えます:
+#### 8-1. そもそも「interface を捨てる」って何を捨てるんや？
+
+タスク1で書いた `resources/js/types/item.ts` の中身、覚えとるか？こうやったな:
+
+```ts
+// 手書き時代の item.ts（これから捨てるやつ）
+export interface Item {
+  id: number
+  name: string
+  quantity: number
+  memo: string | null
+  purchased: boolean
+  created_at: string      // ← ホンマは string | null やった（タスク1のラストで気づいたな）
+  updated_at: string
+}
+```
+
+これな、**`Item` っちゅう型の中身を、お前の手でゴリゴリ書いとった** わけや。バックエンドが変わったらお前が手で直さなアカンし、nullable も間違える。
+
+「捨てる」っちゅうのは、**この interface の中身を全部消して、Step 7 で生成された `api.d.ts` 内の `Item` を指す別名（エイリアス）に置き換える** っちゅう意味や。**型を持つ場所を「自分の手」から「自動生成ファイル」に引っ越しさせる** イメージやな。
+
+#### 8-2. 書き換え後のコード
+
+`resources/js/types/item.ts` を以下に **丸ごと置き換え** や（上の8行を消して、下の2行に差し替える）:
 
 ```ts
 import type { components } from './api'
@@ -142,11 +231,76 @@ import type { components } from './api'
 export type Item = components['schemas']['Item']
 ```
 
-これだけです。**手書きの interface はすべて消えました。**
+たった3行。**`interface` っちゅう単語が消えた** やろ。これがこのタスクの中核や。
 
-- `Item` という型は、生成された `components['schemas']['Item']` の単なる別名
-- バックエンドが変わったら `npm run generate:types` を再実行 → `Item` も自動で更新
-- 各 `.vue` / `.ts` ファイルは `import type { Item } from '../types/item'` のままで動く（公開 API は変わらない）
+#### 8-3. この2行を1行ずつ読み解くで
+
+**1行目: `import type { components } from './api'`**
+
+```ts
+import type { components } from './api'
+//     ↑          ↑                ↑
+//     ①          ②                ③
+```
+
+- ① `import type` — 「型だけ」を import する TypeScript の構文や。実行時のコードは一切持ってこん（`api.d.ts` には型しか書いてへんから当然や）。
+- ② `components` — Step 7 で見た `api.d.ts` 内の `export interface components` を、そのまま指す。
+- ③ `'./api'` — **これが `./api.d.ts` のことや**。TS は `.d.ts` の拡張子を省略して書く決まりやから、`./api` だけで通じる。**ここが Step 7 で生成したファイルとの直接の接続点** やで。
+
+つまり「**Step 7 で作った `api.d.ts` の `components` 型を持ってこい**」っちゅう意味や。
+
+**2行目: `export type Item = components['schemas']['Item']`**
+
+```ts
+export type Item = components['schemas']['Item']
+
+```
+
+- 右辺は`components` という型 → その中の `schemas` という型 → その中の `Item` という型、を順に取り出してる
+- 取り出した型にItemっちゅう **型の別名（エイリアス）** をつける
+- それをエクスポートするでっていう宣言や
+
+つまり全体としては「**`api.d.ts` の中の `components.schemas.Item` を、`Item` という名前で再エクスポートする**」っちゅう意味や。図にするとこんな感じや:
+
+```
+ Step 7 で生成              Step 8 で書く              各 .vue / .ts は今まで通り
+ ─────────────              ─────────────              ─────────────────────────
+ api.d.ts                    item.ts                    ItemListView.vue など
+ ┌──────────────┐            ┌────────────────────┐    ┌────────────────────┐
+ │ components   │            │ import type {      │    │ import type {      │
+ │  └─schemas   │ ───参照──► │   components       │    │   Item             │
+ │      └─Item  │            │ } from './api'     │    │ } from '../types/  │
+ │   (自動生成) │            │                    │    │   item'            │
+ └──────────────┘            │ export type Item   │ ◄──│                    │
+                             │   = components     │    │ // Item を使う     │
+                             │   ['schemas']      │    └────────────────────┘
+                             │   ['Item']         │
+                             │   (ただの別名)     │
+                             └────────────────────┘
+```
+
+#### 8-4. なんで別名なん？直接使ったらアカンの？
+
+「`api.d.ts` の中身をそのまま使えばええやん？」って思うやろ？確かに各ファイルで毎回これを書いてもええ:
+
+```ts
+// 各ファイルで毎回これを書くハメに…
+import type { components } from '../types/api'
+const item: components['schemas']['Item'] = ...
+```
+
+…長くて読みにくいやろ？せやから **`Item` っちゅう短い別名を1箇所で定義して、他のファイルからは `Item` だけ import すれば済む** ようにしとるんや。
+
+おかげで `.vue` / `.ts` ファイルは今まで通り `import type { Item } from '../types/item'` で動く。**外から見た公開 API は手書き時代と全く同じ** っちゅうことや。**「タスク1で書いた使う側のコードに一切手を入れんで済む」** のはこの薄い1枚ファイルのおかげやで。
+
+#### 8-5. まとめ
+
+- `interface Item { ... }` を **捨てた** = 中身の型定義をお前が手で書くのをやめた
+- 代わりに自動生成された `components['schemas']['Item']` に **別名を付けただけ** の3行になった
+- バックエンドが変わったら `npm run generate:types` 再実行 → `api.d.ts` 更新 → `Item` も自動で追従
+
+> 💀 ここがエレガントなとこや。タスク1で頑張って書いた手書き interface を、たった3行で置き換える。
+> 「えー、3行だけ！？」って驚くやろ？これがな、抽象化の力や。「**型の定義を持つ場所をひとつに集約する**」ことで、お前のコードは "Item の形" を覚える必要がなくなった。覚えてるのは `api.d.ts` だけ。お前の脳のメモリが解放されたで。
 
 ### Step 9: 型チェックを通す
 
@@ -154,32 +308,49 @@ export type Item = components['schemas']['Item']
 ./vendor/bin/sail npx vue-tsc --noEmit
 ```
 
-エラーが出なければ置き換えは成功です。ブラウザで一覧/詳細/追加/削除が今まで通り動くことも確認してください。
+エラーが出んかったら置き換え成功や。ブラウザで一覧/詳細/追加/削除が今まで通り動くことも確認してや。
 
 ---
 
 ## 🔥 もう一度: 自動同期を体験
 
-タスク1の冒頭でやった**バックエンド変更**を、今度はもう一度やってみます。今は何が違うでしょうか？
+タスク1末でやった実験、覚えとるか？`app/Models/Item.php` に `$hidden = ['name']` の1行を足すだけで、画面が静かに壊れたやろ。手書き interface 時代は `vue-tsc` も平然と通ってもうて、お前は何も気付けんかった。
 
-### 実験: `name` を `item_name` に変えてみる
+今日は **全く同じバックエンド変更** をもう一度やる。条件は **検出機構だけが違う**（手書き → 自動生成）。何が変わるか、その目で確かめるんや。
 
-`app/Http/Controllers/Api/ItemController.php` の `index()` を以下に書き換え:
+### 実験: タスク1末と同じ `$hidden` 変更を加える
+
+`app/Models/Item.php` に1行追加:
 
 ```php
-public function index()
+class Item extends Model
 {
-    return Item::orderBy('id', 'desc')->get()->map(function ($item) {
-        return [
-            'id' => $item->id,
-            'item_name' => $item->name,   // ← name を item_name に変えた！
-            'quantity' => $item->quantity,
-        ];
-    });
+    use HasFactory;
+
+    protected $fillable = ['name', 'quantity', 'memo', 'purchased'];
+
+    protected $hidden = ['name'];   // ← タスク1末と全く同じ1行
+
+    protected $casts = [
+        'quantity' => 'integer',
+        'purchased' => 'boolean',
+    ];
 }
 ```
 
-ブラウザでリロード…**画面はやっぱり静かに壊れます**（商品名が消える）。タスク1と同じです。
+ブラウザでリロード…**画面はやっぱり静かに壊れる**（商品名が消える）。タスク1末と一緒や。
+
+「は？じゃあタスク1末と何が違うねん！」って思ったやろ？まあ慌てんと、次見てみい。
+
+#### まずは何もせず型チェックしてみる
+
+```bash
+./vendor/bin/sail npx vue-tsc --noEmit
+```
+
+実は **このタイミングでもまだエラー出ん**。なぜなら `api.d.ts` はバックエンド変更を **まだ取り込んでへん** から。`item.ts` 経由で見てる `Item` 型はまだ `name` を含んだ古い世界線のままや。
+
+「結局タスク1末と一緒やんけ！」って言いたなるやろ？せやけど **今は手があるんや**。
 
 #### 型を再生成してみる
 
@@ -187,24 +358,45 @@ public function index()
 ./vendor/bin/sail npm run generate:types
 ```
 
-そして型チェック:
+これで Scramble が現在の Item モデル（`$hidden` 付き）を読み直して `/docs/api.json` を出し直し → openapi-typescript が `api.d.ts` を更新する。`components.schemas.Item` から `name` が消えるはずや。
+
+#### もう一度型チェック
 
 ```bash
 ./vendor/bin/sail npx vue-tsc --noEmit
 ```
 
-**エラーが出るはずです** ✨
+**今度こそエラーが出る** ✨
 
-なぜなら、`ItemController::index()` のレスポンスシェイプが変わったので、OpenAPI に書かれた `Item` 型から `name` が消えて `item_name` に置き換わったから。
-`ItemListView.vue` で `item.name` を参照しているコードが、もう存在しないプロパティを使っていることになります。
+```
+ItemListView.vue:XX:XX - error TS2339: Property 'name' does not exist on type 'Item'.
+ItemDetailView.vue:XX:XX - error TS2339: Property 'name' does not exist on type 'Item'.
+...
+```
 
-> 💀 **これが自動生成の威力**。
-> タスク1の手書き時代は、バックエンドを変えてもフロントエンドは静かに壊れていました。
-> 今は、バックエンドを変えた瞬間に「フロントエンドの何が壊れるか」が型エラーとして全部見えます。
+`item.ts` は `components['schemas']['Item']` の別名や。その `Item` から `name` プロパティが消えた → `item.name` を読んでる全箇所が型エラーとして洗い出される。
+
+#### エディタでも確認してみい
+
+`ItemListView.vue` と `ItemDetailView.vue` をエディタで開いてみ。`item.name` を使ってる箇所が **全部赤波線** になっとるはずや（template の `{{ item.name }}`、削除確認の `${item.name}`、見出しなど）。
+
+ここがポイントや：**この赤波線、タスク1末の実験2で手書き interface から `name` を消したときに出た赤波線と、全く同じ箇所** や。
+
+でも今回お前、`item.ts` にも `.vue` ファイルにも **一切触ってへん**。Item モデルに `$hidden` の1行を足しただけ。それでターミナルもエディタも「ここ壊れるで」を漏れなく教えてくれた。これが「**真実がバックエンドから自動で降りてくる**」っちゅうことや。
+
+> 💀 **これが自動生成の威力や。**
+> タスク1末の手書き時代は、**全く同じバックエンド変更** をしても interface は古い `name: string` を信じ続けて、`vue-tsc` も平然と通ってもうた。
+> 今は `npm run generate:types` の **たった1コマンド** で「フロントエンドの何が壊れるか」が型エラーとして全部見える。
+> ワシの教え子のニュートンくんが「リンゴが落ちるのを見て引力に気づいた」みたいに、お前は今「型が降りてくる」のを目撃したんや。
+> はい、Oh, My God!! ←親友の釈迦と決めポーズや。
 
 ### 元に戻す
 
-実験が終わったら、`ItemController::index()` を元のコード（`return Item::orderBy('id', 'desc')->get();`）に戻して、`npm run generate:types` を再実行してください。`vue-tsc --noEmit` がエラーなく通る状態にしておきます。
+実験が終わったら以下の手順で戻してや:
+
+1. `app/Models/Item.php` から `protected $hidden = ['name'];` の1行を削除
+2. 型を再生成: `./vendor/bin/sail npm run generate:types`
+3. `vue-tsc --noEmit` がエラーなく通り、ブラウザで商品名が再び表示されることを確認
 
 ---
 
@@ -212,12 +404,13 @@ public function index()
 
 - [ ] `dedoc/scramble` がインストール済み
 - [ ] `routes/web.php` の catch-all が `docs` も除外している
-- [ ] `/docs/api` で Swagger UI が表示できる
 - [ ] `package.json` に `generate:types` スクリプトがある
-- [ ] `npm run generate:types` で `resources/js/types/api.d.ts` が生成される
+- [ ] `npm run generate:types` で `resources/js/types/api.d.ts` が生成されている
 - [ ] `resources/js/types/item.ts` から手書きの interface が消え、生成型を re-export している
 - [ ] `./vendor/bin/sail npx vue-tsc --noEmit` がエラーなく通る
 - [ ] ブラウザで一覧/詳細/追加/削除が今まで通り動く
+
+全部チェックついたか？お疲れ様やで！あんみつでも食べて一息や。🍨
 
 ---
 
@@ -226,14 +419,16 @@ public function index()
 ```bash
 git add .
 git commit -m "task-2: OpenAPI 型自動生成パイプラインを導入"
-git push origin okumura/task-2   # ← 自分の作業ブランチ名
+git push origin okumura/task-2   # ← 自分の作業ブランチ名に変えるんやで
 ```
 
-GitHub で **親リポジトリ（upstream）の `task-2` に向けて** Pull Request を作成してください。
+GitHub で **親リポジトリ（upstream）の `task-2` に向けて** Pull Request を作成してや。
 
 - **base**: `okumura-env/shopping-list-training` の `task-2`
 - **compare（head）**: `<あなたのfork>/shopping-list-training` の `okumura/task-2`
 
-⚠️ **PR はマージしないでください**。`task-2` ブランチは次の受講生のスタート地点として綺麗に保つためです。
+⚠️ **PR はマージしないでな**。`task-2` ブランチは次の受講生のスタート地点として綺麗に保つためや。
 
-次のタスクへ進むには `docs/task-3.md` を読んでください（冒頭にスタート手順があります）。
+次のタスクへ進むには `docs/task-3.md` を読んでや（冒頭にスタート手順があるで）。
+
+ほな、また会おか。お供えのあんみつは随時受付中やからな🍨。
