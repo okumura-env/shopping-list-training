@@ -28,7 +28,7 @@
 
 🙋 「OpenAPI…？ChatGPTの会社ですか？🤔🤖」
 
-🐘 「あほ！それはOpenAIや！わしが言うとるのは**OpenAPI**な！まあこれからじっくり教えたるから、あんみつ片手についてこい」
+🐘 「あほ！それはOpenAIや！わしが言うとるのは**OpenAPI**な！まあこれからじっくり教えたるから、あんみつ片手についてこい🏃‍♀️🍨」
 
 ---
 
@@ -357,29 +357,21 @@ const item: components['schemas']['Item'] = ...
 
 ## 🔥 もう一度: 自動同期を体験
 
-タスク1末でやった実験、覚えとるか？`app/Models/Item.php` に `$hidden = ['name']` の1行を足すだけで、画面が静かに壊れたやろ。手書き interface 時代は `vue-tsc` も平然と通ってもうて、お前は何も気付けんかった。
+タスク1末でやった実験、覚えとるか？migration から `name` カラムをコメントアウトして `migrate:fresh --seed` したら、画面が静かに壊れたやろ。手書き interface 時代は `vue-tsc` も平然と通ってもうて、お前は何も気付けんかった。
 
 今日は **全く同じバックエンド変更** をもう一度やる。条件は **検出機構だけが違う**（手書き → 自動生成）。何が変わるか、その目で確かめるんや。
 
-### 実験: タスク1末と同じ `$hidden` 変更を加える
+### 実験: タスク1末と同じ「name カラム削除」を加える
 
-`app/Models/Item.php` に1行追加:
+タスク1末と全く同じ手順で `name` カラムを消すで:
 
-```php
-class Item extends Model
-{
-    use HasFactory;
+1. `database/migrations/<タイムスタンプ>_create_items_table.php` の `$table->string('name');` を **コメントアウト**
+2. `database/factories/ItemFactory.php` の `'name' => fake()->randomElement([...])` も **コメントアウト**（タスク1末で踏んだハマりや、覚えとるな？）
+3. DB を作り直す:
 
-    protected $fillable = ['name', 'quantity', 'memo', 'purchased'];
-
-    protected $hidden = ['name'];   // ← タスク1末と全く同じ1行
-
-    protected $casts = [
-        'quantity' => 'integer',
-        'purchased' => 'boolean',
-    ];
-}
-```
+   ```bash
+   ./vendor/bin/sail artisan migrate:fresh --seed
+   ```
 
 ブラウザでリロード…**画面はやっぱり静かに壊れる**（商品名が消える）。タスク1末と一緒や。
 
@@ -401,7 +393,7 @@ class Item extends Model
 ./vendor/bin/sail npm run generate:types
 ```
 
-これで Scramble が現在の Item モデル（`$hidden` 付き）を読み直して `/docs/api.json` を出し直し → openapi-typescript が `api.d.ts` を更新する。`components.schemas.Item` から `name` が消えるはずや。
+これで Scramble が現在の Item モデル（`name` カラム削除済み）を読み直して `/docs/api.json` を出し直し → openapi-typescript が `api.d.ts` を更新する。`components.schemas.Item` から `name` が消えるはずや。
 
 #### もう一度型チェック
 
@@ -425,7 +417,7 @@ ItemDetailView.vue:XX:XX - error TS2339: Property 'name' does not exist on type 
 
 ここがポイントや：**この赤波線、タスク1末の実験2で手書き interface から `name` を消したときに出た赤波線と、全く同じ箇所** や。
 
-でも今回お前、`item.ts` にも `.vue` ファイルにも **一切触ってへん**。Item モデルに `$hidden` の1行を足しただけ。それでターミナルもエディタも「ここ壊れるで」を漏れなく教えてくれた。これが「**真実がバックエンドから自動で降りてくる**」っちゅうことや。
+でも今回お前、`item.ts` にも `.vue` ファイルにも **一切触ってへん**。migration と Factory から `name` を消しただけや。それでターミナルもエディタも「ここ壊れるで」を漏れなく教えてくれた。これが「**真実がバックエンドから自動で降りてくる**」っちゅうことや。
 
 > 💀 **これが自動生成の威力や。**
 > タスク1末の手書き時代は、**全く同じバックエンド変更** をしても interface は古い `name: string` を信じ続けて、`vue-tsc` も平然と通ってもうた。
@@ -437,9 +429,14 @@ ItemDetailView.vue:XX:XX - error TS2339: Property 'name' does not exist on type 
 
 実験が終わったら以下の手順で戻してや:
 
-1. `app/Models/Item.php` から `protected $hidden = ['name'];` の1行を削除
-2. 型を再生成: `./vendor/bin/sail npm run generate:types`
-3. `vue-tsc --noEmit` がエラーなく通り、ブラウザで商品名が再び表示されることを確認
+1. `database/migrations/<タイムスタンプ>_create_items_table.php` の `$table->string('name');` のコメントアウトを外す
+2. `database/factories/ItemFactory.php` の `'name' => fake()->...` のコメントアウトを外す
+3. DB 作り直し:
+   ```bash
+   ./vendor/bin/sail artisan migrate:fresh --seed
+   ```
+4. 型を再生成: `./vendor/bin/sail npm run generate:types`
+5. `vue-tsc --noEmit` がエラーなく通り、ブラウザで商品名が再び表示されることを確認
 
 ---
 
