@@ -220,7 +220,26 @@ deleteItem → apiClient.delete(`/items/${id}`)
 
 ### Step 1: 共通の「エラーメッセージ抽出関数」を作る
 
-新規ファイル `resources/js/utils/handleError.ts` を作成:
+新規ファイル `resources/js/utils/handleError.ts` を作成や。**`utils/` ディレクトリも新規作成** やで（既存にはない）:
+
+```
+resources/
+└── js/
+    ├── api/
+    │   ├── client.ts              # Step 2 で interceptor を追加
+    │   └── items.ts
+    ├── router/
+    ├── types/
+    ├── utils/                     ← ★ ディレクトリを新規作成
+    │   └── handleError.ts         ← ★ このファイルを新規作成
+    ├── views/
+    │   ├── ItemListView.vue       # Step 3 で catch を統一
+    │   └── ItemDetailView.vue     # Step 4 で catch を統一
+    ├── App.vue
+    └── app.ts
+```
+
+ファイルの中身はこれや:
 
 ```ts
 import { AxiosError } from 'axios'

@@ -61,6 +61,31 @@ git checkout -b okumura/task-3     # ← 自分の名前に置き換えるんや
 
 これを **DB のカラム追加から始めて、全レイヤーで型を貫通させながら** 実装していく。
 
+### 📁 今回触るファイル（全レイヤーを貫通する地図）
+
+`priority` カラム1つが、以下の全レイヤーに順に降りていくで:
+
+```
+プロジェクトルート/
+├── app/
+│   └── Models/
+│       └── Item.php                    # ② $fillable / $casts に priority を追加
+├── database/
+│   └── migrations/
+│       └── <タイムスタンプ>_add_priority_to_items_table.php   # ① ★ 新規生成（artisan）
+└── resources/
+    └── js/
+        ├── api/
+        │   └── items.ts                # ⑤ createItem の引数型に priority を追加
+        ├── types/
+        │   └── api.d.ts                # ④ generate:types で priority が自動反映
+        └── views/
+            ├── ItemListView.vue        # ⑥ 一覧 template に表示
+            └── ItemDetailView.vue      # ⑦ 詳細 template に表示
+```
+
+> 💡 番号は実装順とほぼ対応しとる。**「DB → Model → 型 → 画面」っちゅう一方通行の流れ** や。タスク1の手書き時代は ④ も手作業で漏れる可能性があったけど、今は **自動で降りてくる**。これが今回体感する「気持ちよさ」の正体や。
+
 ---
 
 ## ✏️ 実装手順

@@ -201,7 +201,20 @@ curl -s http://localhost:8081/docs/api.json | python3 -m json.tool | head -80
 ./vendor/bin/sail npm run generate:types
 ```
 
-`resources/js/types/api.d.ts` が生成される。これが OpenAPI から自動生成された **TypeScript の真実** や。
+`resources/js/types/api.d.ts` が **自動生成** される。これが OpenAPI から自動生成された **TypeScript の真実** や。位置はここやで:
+
+```
+resources/
+└── js/
+    ├── api/
+    ├── router/
+    ├── types/
+    │   ├── api.d.ts             ← ★ 自動生成（このコマンドで新規作成された）
+    │   └── item.ts              ← Step 8 で書き換える（手書き interface を捨てる）
+    ├── views/
+    ├── App.vue
+    └── app.ts
+```
 
 中を覗いてみい。1000行近くあるけどビビらんでええ。今お前が気にすべきは **`export interface components`** の中の **`schemas`** の中の **`Item`** や。ざっくりこんな構造になっとるはずやで:
 

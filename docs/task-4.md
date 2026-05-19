@@ -185,6 +185,22 @@ npx husky init
 - その中に **`pre-commit`** っちゅうサンプルファイルが生成される
 - `package.json` の `scripts.prepare` に `husky` が追加される（`npm install` 時にフックを自動セットアップしてくれる）
 
+位置関係はこれや。プロジェクトルート（`resources/` や `app/` と同じ階層）に `.husky/` ができる:
+
+```
+プロジェクトルート/
+├── .husky/                          ← ★ 新規ディレクトリ
+│   └── pre-commit                   ← ★ サンプルファイル（Step 3 で書き換える）
+├── app/
+├── database/
+├── resources/
+├── routes/
+├── package.json                     # ← scripts.prepare に "husky" が追加される
+└── ...
+```
+
+> 💡 `.husky/` は先頭にドット（`.`）が付くので **隠しディレクトリ扱い** や。`ls` だけだと見えへんから、`ls -la` で確認するんやで。
+
 確認:
 
 ```bash
