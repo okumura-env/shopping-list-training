@@ -162,7 +162,7 @@ node -v
 npm -v
 ```
 
-バージョンが表示されたら OK（v18 以上が望ましい）。`command not found` やったら macOS なら **`brew install node`** で入れる。
+バージョンが表示されたら OK（**v20 以上が望ましい**。Node 18 は 2025年4月で EOL、しかも後で使う `lint-staged` の依存が `node:util.styleText`（Node 20.12+ の API）を要求するので、commit したタイミングで爆発するで）。`command not found` やったら macOS なら **`brew install node`** で入れる。
 
 > 💡 これまで `sail npm` でコンテナ内の Node.js を使うてきた。なんで今回はホスト側？っちゅう答えは Step 3 の解説で。
 
